@@ -8,7 +8,7 @@ func (a *ovhAuthModule) getConsumerKey(redirection string) (*ovh.CkValidationSta
 		return nil, err
 	}
 
-	ckRequest := ovhClient.NewCkRequest()
+	ckRequest := ovhClient.NewCkRequestWithRedirection(redirection)
 	ckRequest.AddRule("GET", "/me")
 
 	ckValidationState, err := ckRequest.Do()
@@ -19,16 +19,14 @@ func (a *ovhAuthModule) getConsumerKey(redirection string) (*ovh.CkValidationSta
 	return ckValidationState, nil
 }
 
-// -------------------------
-
 // Me represents an OVH user
 type Me struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
-// OvhGetMe calls the OVH API /me endpoint given an OVH config and a consumer key and
-// unmarshals the JSON response in the value pointed to by result
+// getMe calls the OVH API /me endpoint given a consumer key and
+// return the corresponding Me
 func (a *ovhAuthModule) GetMe(consumerKey string) (*Me, error) {
 
 	ovhClient, err := ovh.NewDefaultClient()

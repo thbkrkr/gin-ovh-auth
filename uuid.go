@@ -7,8 +7,8 @@ import (
 
 // https://github.com/germ/go-bits/blob/master/puuid/puuid.go
 
-// GenerateUUID generates an UUID
-func GenerateUUID() string {
+// generateUUID generates an UUID
+func generateUUID() string {
 	var uuid string
 	rand.Seed(time.Now().UnixNano())
 

@@ -10,34 +10,40 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Register installs OVH authentication in a gin router
-func Register(c *gin.Engine) error {
-	baseURL := os.Getenv("AUTH_BASE_URL")
+// Secure installs the OVH authentication in a given gin-gonic router
+func Secure(c *gin.Engine) *gin.RouterGroup {
+	baseURL := os.Getenv("AUTH_LOGIN_URL")
 	if len(baseURL) == 0 {
-		logrus.Fatal("AUTH_BASE_URL is empty")
+		logrus.Fatal("AUTH_LOGIN_URL is empty")
+	}
+	secret := os.Getenv("AUTH_SECRET")
+	if len(secret) == 0 {
+		logrus.Fatal("AUTH_SECRET is empty")
 	}
 
 	authModule := ovhAuthModule{
 		baseURL: baseURL,
+		secret:  secret,
 	}
-
-	authorized := c.Group("/api")
-	authorized.Use(authRequired())
 
 	c.GET("/auth/credential", authModule.GetCredential)
 	c.GET("/auth/validate/:token", authModule.ValidateToken)
 
-	return nil
+	authorized := c.Group("/")
+	authorized.Use(jWTAuthMiddleware(secret))
+
+	return authorized
 }
 
 type ovhAuthModule struct {
 	baseURL string
+	secret  string
 }
 
 // GetCredential calls the OVH API to get a validation URL and a consumer key
 // The consumer key is stored in memory and a token
 func (a *ovhAuthModule) GetCredential(c *gin.Context) {
-	token := GenerateUUID()
+	token := generateUUID()
 	redirection := a.baseURL + "/?token=" + token
 
 	ckValidationState, err := a.getConsumerKey(redirection)
@@ -47,7 +53,7 @@ func (a *ovhAuthModule) GetCredential(c *gin.Context) {
 	}
 
 	// Store consumerKey to retrieve it later
-	KeysMap.Set(token, ckValidationState.ConsumerKey)
+	keysMap.set(token, ckValidationState.ConsumerKey)
 
 	c.JSON(200, gin.H{"url": ckValidationState.ValidationURL})
 }
@@ -61,7 +67,7 @@ func (a *ovhAuthModule) ValidateToken(c *gin.Context) {
 	}
 
 	// Retrieve the consumer key given the token
-	consumerKey := KeysMap.Get(token)
+	consumerKey := keysMap.get(token)
 	if consumerKey == "" {
 		HTTPError(c, 400, errors.New("Token invalid"), nil)
 		return
@@ -85,7 +91,7 @@ func (a *ovhAuthModule) ValidateToken(c *gin.Context) {
 		return
 	}
 
-	auth, err := Encrypt(CryptoKey, string(authUserString))
+	auth, err := SignAuth(string(authUserString), a.secret)
 	if err != nil {
 		HTTPError(c, 400, err, err)
 		return
@@ -93,6 +99,7 @@ func (a *ovhAuthModule) ValidateToken(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"auth":  auth,
+		"name":  me.Name,
 		"email": me.Email,
 	})
 }
@@ -113,8 +120,7 @@ type Map struct {
 	Map  map[string]string
 }
 
-// get the map's value
-func (this *Map) Get(key string) (v string) {
+func (this *Map) get(key string) (v string) {
 	this.lock.RLock()
 	defer this.lock.RUnlock()
 	if v, ok := this.Map[key]; ok {
@@ -123,13 +129,13 @@ func (this *Map) Get(key string) (v string) {
 	return ""
 }
 
-func (this *Map) Set(key string, value string) {
+func (this *Map) set(key string, value string) {
 	this.lock.RLock()
 	defer this.lock.RUnlock()
 	this.Map[key] = value
 }
 
 // KeysMap keeps the user consumerKeys in memory
-var KeysMap = Map{
+var keysMap = Map{
 	Map: make(map[string]string),
 }
