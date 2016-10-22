@@ -10,7 +10,6 @@
 
   DEFAULT_AUTH_HOME_PATH = '/s/'
   DEFAULT_AUTH_LOGIN_PATH = '/s/login.html'
-  DEFAULT_AUTH_HEADER = 'X-Auth'
 
   if (typeof(AUTH_HOME_PATH) === 'undefined') {
     AUTH_HOME_PATH = DEFAULT_AUTH_HOME_PATH
@@ -18,9 +17,6 @@
 
   if (typeof(AUTH_LOGIN_PATH) === 'undefined') {
     AUTH_LOGIN_PATH = DEFAULT_AUTH_LOGIN_PATH
-  }
-  if (typeof(AUTH_HEADER) === 'undefined') {
-    AUTH_HEADER = DEFAULT_AUTH_HEADER
   }
 
   window.addEventListener('load', function() {
@@ -68,68 +64,5 @@
   }
 
   // --
-
-  //@ Extract query param from the URL
-  this.$param = function $param(name) {
-      var url = window.location.href
-      name = name.replace(/[\[\]]/g, "\\$&")
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-          results = regex.exec(url)
-      if (!results) return null
-      if (!results[2]) return ''
-      return decodeURIComponent(results[2].replace(/\+/g, " "))
-  }
-
-  //@ HTTP GET
-  this.$get = function $get(url, onSuccess, onFailure, noauth) {
-    return $ajax(url, undefined, onSuccess, onFailure, noauth)
-  }
-
-  //@ HTTP POST
-  this.$post = function $post(url, data, onSuccess, onFailure, noauth) {
-    return $ajax(url, data, onSuccess, onFailure, noauth)
-  }
-
-  // $.ajax with the auth header and a redirection to the login page
-  // with a  local storage clean if an HTTP call return 401.
-  this.$ajax = function $ajax(url, data, onSuccess, onFailure, noauth) {
-    var headers = {}
-    var auth = localStorage.getItem(AUTH_LOCAL_STORAGE_KEY)
-    if (auth) {
-      headers[AUTH_HEADER] = auth
-    }
-    type = 'GET'
-    if (data) {
-      type = 'POST'
-    }
-    req = {
-      type: type,
-      url: url,
-      contentType: "application/json",
-      headers: headers,
-      success: function(response) {
-        if (typeof response === 'object') {
-          onSuccess(response)
-        } else {
-          onSuccess(JSON.parse(response))
-        }
-      },
-      error: function(xhr, errorType, error) {
-        // Redirect to home if authentication error
-        if (xhr.status === 401 && !noauth) {
-          $logout()
-        }
-        if (!onFailure) {
-          console.error("error on " + url + " status="+ xhr.status)
-          return
-        }
-        onFailure(error)
-      }
-    }
-    if (data) {
-      req.data = JSON.stringify(data)
-    }
-    $.ajax(req)
-  }
 
 })()
