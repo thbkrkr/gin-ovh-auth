@@ -9,7 +9,10 @@ func (a *ovhAuthModule) getConsumerKey(redirection string) (*ovh.CkValidationSta
 	}
 
 	ckRequest := ovhClient.NewCkRequestWithRedirection(redirection)
-	ckRequest.AddRule("GET", "/me")
+	ckRequest.AddRule("GET", "/*")
+	ckRequest.AddRule("POST", "/*")
+	ckRequest.AddRule("PUT", "/*")
+	ckRequest.AddRule("DELETE", "/*")
 
 	ckValidationState, err := ckRequest.Do()
 	if err != nil {
