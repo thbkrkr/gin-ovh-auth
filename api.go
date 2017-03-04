@@ -24,6 +24,7 @@ func (a *ovhAuthModule) getConsumerKey(redirection string) (*ovh.CkValidationSta
 
 // Me represents an OVH user
 type Me struct {
+	ID    string `json:"nichandle"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
