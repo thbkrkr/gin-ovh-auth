@@ -29,10 +29,9 @@ type Me struct {
 	Email string `json:"email"`
 }
 
-// getMe calls the OVH API /me endpoint given a consumer key and
+// GetMe calls the OVH API /me endpoint given a consumer key and
 // return the corresponding Me
 func (a *ovhAuthModule) GetMe(consumerKey string) (*Me, error) {
-
 	ovhClient, err := ovh.NewDefaultClient()
 	ovhClient.ConsumerKey = consumerKey
 	if err != nil {

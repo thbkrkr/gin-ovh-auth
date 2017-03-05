@@ -11,6 +11,7 @@ import (
 )
 
 // Secure installs the OVH authentication in a given gin-gonic router
+// given a login url and a secret to encrypt user consumer key
 func Secure(c *gin.Engine) *gin.RouterGroup {
 	baseURL := os.Getenv("AUTH_LOGIN_URL")
 	if len(baseURL) == 0 {
@@ -40,8 +41,8 @@ type ovhAuthModule struct {
 	secret  string
 }
 
-// GetCredential calls the OVH API to get a validation URL and a consumer key
-// The consumer key is stored in memory and a token
+// GetCredential calls the OVH API to get a validation URL and a consumer key.
+// The consumer key is stored in memory and a token.
 func (a *ovhAuthModule) GetCredential(c *gin.Context) {
 	token := generateUUID()
 	redirection := a.baseURL + "/?token=" + token

@@ -56,7 +56,7 @@ Add a 'clickable' element with a `login` id in the `$AUTH_LOGIN_URL` page.
 
 ```html
 <button id="login">Login</button>
-<script src="//thbkrkr.github.io/ovh-auth/js/auth.1.min.js"></script>
+<script src="//thbkrkr.github.io/gin-ovh-auth/js/auth.1.min.js"></script>
 ```
 
 #### index.html ($AUTH_HOME_URL)
@@ -64,7 +64,7 @@ Add a 'clickable' element with a `login` id in the `$AUTH_LOGIN_URL` page.
 Call your API with `$get` and `$post`.
 
 ```html
-<script src="//thbkrkr.github.io/ovh-auth/js/auth.1.min.js"></script>
+<script src="//thbkrkr.github.io/gin-ovh-auth/js/auth.1.min.js"></script>
 <script>
 $get('/api/me', function(me) {
   $('.me').html(JSON.stringify(me))

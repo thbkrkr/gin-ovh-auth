@@ -27,7 +27,7 @@ func jWTAuthMiddleware(secret string) gin.HandlerFunc {
 		rawToken := c.Request.Header.Get("X-Auth")
 
 		if rawToken == "" {
-			c.AbortWithError(401, errors.New("Authentication failed"))
+			c.AbortWithError(401, errors.New("Authorization failed"))
 			return
 		}
 
@@ -39,20 +39,20 @@ func jWTAuthMiddleware(secret string) gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithError(401, err)
 		} else if token == nil {
-			c.AbortWithError(401, err)
+			c.AbortWithError(401, errors.New("Authorization failed"))
 		} else {
 
 			claims, ok := token.Claims.(jwt.MapClaims)
 			if !ok || !token.Valid {
-				c.AbortWithError(401, err)
+				c.AbortWithError(401, errors.New("Authorization failed"))
 			}
 
 			sauthUser := claims["auth"].(string)
 			var authUser AuthUser
 			err := json.Unmarshal([]byte(sauthUser), &authUser)
 			if err != nil {
-				logrus.WithError(err).Error("Fail to unmarshall auth user")
-				c.AbortWithError(401, errors.New("Authentication failed"))
+				logrus.WithError(err).Error("Fail to unmarshal auth user")
+				c.AbortWithError(401, errors.New("Authorization failed"))
 				return
 			}
 

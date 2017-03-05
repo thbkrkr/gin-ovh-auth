@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ovh/go-ovh/ovh"
+	"github.com/thbkrkr/gin-ovh-auth"
 	"github.com/thbkrkr/go-utilz/http"
-	"github.com/thbkrkr/ovh-auth"
 )
 
 var (
@@ -17,7 +17,7 @@ var (
 func main() {
 	flag.Parse()
 
-	http.API("example", buildDate, gitCommit, router)
+	http.API("example", buildDate, gitCommit, 4242, router)
 }
 
 func router(r *gin.Engine) {
