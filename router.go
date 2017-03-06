@@ -68,11 +68,13 @@ func (a *ovhAuthModule) ValidateToken(c *gin.Context) {
 	}
 
 	// Retrieve the consumer key given the token
-	consumerKey := keysMap.get(token)
-	if consumerKey == "" {
+	consumerKey, ko := keysMap.get(token)
+	if ko {
 		HTTPError(c, 400, errors.New("Token invalid"), nil)
 		return
 	}
+
+	keysMap.delete(token)
 
 	// Get me
 	me, err := a.GetMe(consumerKey)
@@ -121,19 +123,25 @@ type Map struct {
 	Map  map[string]string
 }
 
-func (this *Map) get(key string) (v string) {
+func (this *Map) get(key string) (v string, ko bool) {
 	this.lock.RLock()
 	defer this.lock.RUnlock()
 	if v, ok := this.Map[key]; ok {
-		return v
+		return v, false
 	}
-	return ""
+	return "", true
 }
 
 func (this *Map) set(key string, value string) {
-	this.lock.RLock()
-	defer this.lock.RUnlock()
+	this.lock.Lock()
+	defer this.lock.Unlock()
 	this.Map[key] = value
+}
+
+func (this *Map) delete(key string) {
+	this.lock.Lock()
+	defer this.lock.Unlock()
+	delete(this.Map, key)
 }
 
 // KeysMap keeps the user consumerKeys in memory
