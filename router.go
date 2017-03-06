@@ -3,6 +3,7 @@ package ovhauth
 import (
 	"encoding/json"
 	"errors"
+	"net/url"
 	"os"
 	"sync"
 
@@ -45,7 +46,15 @@ type ovhAuthModule struct {
 // The consumer key is stored in memory and a token.
 func (a *ovhAuthModule) GetCredential(c *gin.Context) {
 	token := generateUUID()
+
+	redirect, ok := c.GetQuery("redirect")
 	redirection := a.baseURL + "/?token=" + token
+	if ok {
+		redirection, err := url.QueryUnescape(redirect)
+		if err != nil {
+			redirection += token
+		}
+	}
 
 	ckValidationState, err := a.getConsumerKey(redirection)
 	if err != nil {

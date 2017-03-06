@@ -8,6 +8,7 @@ func (a *ovhAuthModule) getConsumerKey(redirection string) (*ovh.CkValidationSta
 		return nil, err
 	}
 
+	// TODO be able to parametrize rules
 	ckRequest := ovhClient.NewCkRequestWithRedirection(redirection)
 	ckRequest.AddRule("GET", "/*")
 	ckRequest.AddRule("POST", "/*")
