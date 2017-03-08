@@ -13,10 +13,17 @@ OVH_ENDPOINT=ovh-eu
 OVH_APPLICATION_KEY=??
 OVH_APPLICATION_SECRET=??
 
-# Login URL of the page with the login button
-AUTH_LOGIN_URL=https://??/s/login.html
 # Secret to sign the auth data
 AUTH_SECRET=??
+```
+
+Optional variables
+
+```
+# Login page URL of the login page (which contains a #login button)
+AUTH_LOGIN_URL=https://??/s/login.html
+# Home page URL
+AUTH_HOME_PATH=https://??/s/login.html
 ```
 
 #### API

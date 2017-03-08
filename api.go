@@ -35,6 +35,7 @@ func (a *ovhAuthModule) GetCredential(c *gin.Context) {
 		HTTPError(c, 400, err, err)
 		return
 	}
+	redirection += "?token=" + token
 
 	rules := map[string]string{
 		"GET":    "/*",
