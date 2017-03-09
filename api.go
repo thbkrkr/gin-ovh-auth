@@ -40,14 +40,23 @@ func (a *ovhAuthModule) GetConsumerKey(c *gin.Context) {
 	}
 	redirection += "?token=" + token
 
-	rules := map[string]string{
-		"GET":    "/*",
-		"POST":   "/*",
-		"PUT":    "/*",
-		"DELETE": "/*",
+	if a.rules == nil {
+		a.rules = map[string]string{}
+	}
+	if a.rules["GET"] == "" {
+		a.rules["GET"] = "/*"
+	}
+	if a.rules["POST"] == "" {
+		a.rules["POST"] = "/*"
+	}
+	if a.rules["PUT"] == "" {
+		a.rules["PUT"] = "/*"
+	}
+	if a.rules["DELETE"] == "" {
+		a.rules["DELETE"] = "/*"
 	}
 
-	ckValidationState, err := a.getConsumerKey(rules, redirection)
+	ckValidationState, err := a.getConsumerKey(a.rules, redirection)
 	if err != nil {
 		HTTPError(c, 400, err, err)
 		return
@@ -121,10 +130,10 @@ func (a *ovhAuthModule) getConsumerKey(rules map[string]string, redirection stri
 
 	// TODO be able to parametrize rules
 	ckRequest := ovhClient.NewCkRequestWithRedirection(redirection)
-	ckRequest.AddRule("GET", "/*")
-	ckRequest.AddRule("POST", "/*")
-	ckRequest.AddRule("PUT", "/*")
-	ckRequest.AddRule("DELETE", "/*")
+	ckRequest.AddRule("GET", rules["GET"])
+	ckRequest.AddRule("POST", rules["POST"])
+	ckRequest.AddRule("PUT", rules["PUT"])
+	ckRequest.AddRule("DELETE", rules["DELETE"])
 
 	ckValidationState, err := ckRequest.Do()
 	if err != nil {

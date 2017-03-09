@@ -21,7 +21,7 @@ func main() {
 }
 
 func router(r *gin.Engine) {
-	authRouter := ovhauth.Secure(r)
+	authRouter := ovhauth.Secure(r, nil)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ping"})

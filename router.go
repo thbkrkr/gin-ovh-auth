@@ -9,7 +9,7 @@ import (
 
 // Secure installs the OVH authentication in a given gin-gonic router
 // given a redirect url and a secret to encrypt user consumer key
-func Secure(c *gin.Engine) *gin.RouterGroup {
+func Secure(c *gin.Engine, rules map[string]string) *gin.RouterGroup {
 	secret := os.Getenv("AUTH_SECRET")
 	if len(secret) == 0 {
 		logrus.Fatal("AUTH_SECRET is empty")
