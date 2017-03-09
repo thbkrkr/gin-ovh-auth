@@ -9,11 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AuthUser is an authenticated user and its consume key
 type AuthUser struct {
 	Me          Me     `json:"me"`
 	ConsumerKey string `json:"consumerKey"`
 }
 
+// GetAuthUser returns the authenticated user stores in
+// the current context
 func GetAuthUser(c *gin.Context) *AuthUser {
 	return c.MustGet("auth").(*AuthUser)
 }

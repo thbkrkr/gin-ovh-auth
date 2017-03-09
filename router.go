@@ -19,7 +19,7 @@ func Secure(c *gin.Engine) *gin.RouterGroup {
 		secret: secret,
 	}
 
-	c.GET("/auth/credential", authModule.GetCredential)
+	c.GET("/auth/credential", authModule.GetConsumerKey)
 	c.GET("/auth/validate/:token", authModule.ValidateToken)
 
 	authorized := c.Group("/")
