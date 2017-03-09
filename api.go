@@ -38,7 +38,6 @@ func (a *ovhAuthModule) GetConsumerKey(c *gin.Context) {
 		HTTPError(c, 400, err, err)
 		return
 	}
-	redirection += "?token=" + token
 
 	if a.rules == nil {
 		a.rules = map[string]string{}
@@ -65,7 +64,10 @@ func (a *ovhAuthModule) GetConsumerKey(c *gin.Context) {
 	// Store consumerKey to retrieve it later
 	cache.set(token, ckValidationState.ConsumerKey)
 
-	c.JSON(200, gin.H{"url": ckValidationState.ValidationURL})
+	c.JSON(200, gin.H{
+		"url":   ckValidationState.ValidationURL,
+		"token": token,
+	})
 }
 
 // ValidateToken retrieves a consumer key given a token
@@ -116,19 +118,12 @@ func (a *ovhAuthModule) ValidateToken(c *gin.Context) {
 	})
 }
 
-// HTTPError logs an error and returns an HTTP error given a status cod, erre
-func HTTPError(c *gin.Context, status int, userErr error, err error) {
-	logrus.WithError(err).WithField("status", status)
-	c.JSON(status, gin.H{"error": userErr.Error()})
-}
-
 func (a *ovhAuthModule) getConsumerKey(rules map[string]string, redirection string) (*ovh.CkValidationState, error) {
 	ovhClient, err := ovh.NewDefaultClient()
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO be able to parametrize rules
 	ckRequest := ovhClient.NewCkRequestWithRedirection(redirection)
 	ckRequest.AddRule("GET", rules["GET"])
 	ckRequest.AddRule("POST", rules["POST"])
@@ -166,4 +161,13 @@ func (a *ovhAuthModule) GetMe(consumerKey string) (*Me, error) {
 	}
 
 	return &me, nil
+}
+
+// HTTPError logs an error and returns an HTTP error given a status code
+func HTTPError(c *gin.Context, status int, retErr error, err error) {
+	if err == nil {
+		err = retErr
+	}
+	logrus.WithError(err).WithField("status", status)
+	c.JSON(status, gin.H{"error": retErr.Error()})
 }
