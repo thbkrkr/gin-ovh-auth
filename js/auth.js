@@ -6,19 +6,23 @@
   AUTH_LOGIN_ELEM_ID = 'login'
   AUTH_LOGOUT_ELEM_ID = 'logout'
 
-  AUTH_CREDS_URL = '/auth/credential'
-  AUTH_VALIDATION_URL = '/auth/validate/'
-  AUTH_LOCAL_STORAGE_KEY = 'auth'
-  TOKEN_LOCAL_STORAGE_KEY = 'token'
-
-  DEFAULT_AUTH_HOME_PATH = '/s/'
-  DEFAULT_AUTH_LOGIN_PATH = '/s/login.html'
-
+  if (typeof(AUTH_CREDS_URL) === 'undefined') {
+    AUTH_CREDS_URL = '/auth/credential'
+  }
+  if (typeof(AUTH_VALIDATION_URL) === 'undefined') {
+    AUTH_VALIDATION_URL = '/auth/validate/'
+  }
+  if (typeof(AUTH_LOCAL_STORAGE_KEY) === 'undefined') {
+    AUTH_LOCAL_STORAGE_KEY = 'auth'
+  }
+  if (typeof(TOKEN_LOCAL_STORAGE_KEY) === 'undefined') {
+    TOKEN_LOCAL_STORAGE_KEY = 'token'
+  }
   if (typeof(AUTH_HOME_PATH) === 'undefined') {
-    AUTH_HOME_PATH = DEFAULT_AUTH_HOME_PATH
+    AUTH_HOME_PATH = '/s/'
   }
   if (typeof(AUTH_LOGIN_PATH) === 'undefined') {
-    AUTH_LOGIN_PATH = DEFAULT_AUTH_LOGIN_PATH
+    AUTH_LOGIN_PATH = '/s/login.html'
   }
 
   window.addEventListener('load', function() {
